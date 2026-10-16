@@ -25,6 +25,18 @@ public class CuentaBancaria {
         this.saldo = saldo;
         this.limiteCredito = limiteCredito;
     }
+    public CuentaBancaria() {
+        this.numeroCuenta = "000000";
+        this.titular = "Sin Nombre";
+        this.saldo = 0.0;
+        this.limiteCredito = 0.0;
+    }
+    public CuentaBancaria(String numeroCuenta, String titular) {
+        this.numeroCuenta = numeroCuenta;
+        this.titular = titular;
+        this.saldo = 0.0;
+        this.limiteCredito = 100.0;
+    }
 
     public String getNumeroCuenta(){
         return this.numeroCuenta;
@@ -53,20 +65,23 @@ public class CuentaBancaria {
     public void setLimiteCredito(Double limiteCredito) {
         this.limiteCredito = limiteCredito;
     }
-    public boolean depositar(double saldo){
-        if (saldo > 0 ) {
-            this.saldo += saldo;
+    public boolean depositar(double monto) {
+        if (monto > 0) {
+            saldo += monto;
             return true;
         } else {
             return false;
         }
-
     }
-    public boolean retirar(double saldo) {
-        if (saldo > 0 && this.saldo + this.limiteCredito >= saldo){
-            this.saldo -= saldo;
+    public boolean retirar(double monto) {
+        double disponible = saldo;
+        if (limiteCredito != null) {
+            disponible += limiteCredito;
+        }
+        if (monto > 0 && disponible >= monto) {
+            saldo -= monto;
             return true;
-        }else {
+        } else {
             return false;
         }
     }

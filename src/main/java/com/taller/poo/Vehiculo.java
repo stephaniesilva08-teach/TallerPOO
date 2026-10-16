@@ -8,6 +8,13 @@ public class Vehiculo {
     private boolean estadoMotor;
 /* escogi primitivos para que el consumo de memoria sea menor */
 
+    public Vehiculo() {
+        this.marcaVehiculo = "Genérico";
+        this.modeloVehiculo = "Sin Modelo";
+        this.kilometrajeActual = 0.0;
+        this.velocidadMaxima = 120;
+        this.estadoMotor = false;
+    }
     public Vehiculo(String marcaVehiculo, String modeloVehiculo, double kilometrajeActual, int velocidadMaxima, boolean estadoMotor) {
         this.marcaVehiculo = marcaVehiculo;
         this.modeloVehiculo = modeloVehiculo;
@@ -55,8 +62,4 @@ public class Vehiculo {
     public void setEstadoMotor(boolean estadoMotor) {
         this.estadoMotor = estadoMotor;
     }
-
-    public Vehiculo() {
-    }
-
 }
