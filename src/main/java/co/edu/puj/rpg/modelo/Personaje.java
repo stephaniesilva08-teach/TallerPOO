@@ -1,126 +1,131 @@
 package co.edu.puj.rpg.modelo;
 
-import co.edu.puj.rpg.modelo.enemigo.Enemigo;
-public class Personaje {
-    private String nombre;
-    private int puntosVida;
-    private int vidaMaxima;
-    private int puntosAtaque;
-    private int nivel;
-    private double oro;
-    private boolean estaVivo;
-    private int experiencia;
-    private int ultimoDanoInfligido;
-    private boolean ultimoGolpeCritico;
+/**
+ * Clase base abstracta de los combatientes (heroes y enemigos).
+ * Guarda el estado común y la lógica que Guerrero y Mago comparten,
+ * pero NO se puede hacer new Personaje(...) porque es abstracta.
+ */
+public abstract class Personaje implements ICombatiente {
 
-    public Personaje(String nombre, int vidaMaxima, int puntosAtaque, double oro) {
+    // Atributos protegidos: las subclases los ven directo, el resto usa getters
+    protected String nombre;
+    protected int vida;
+    protected int ataqueBase;
+    protected int posicionX; // horizontal -> columna del tablero
+    protected int posicionY; // vertical   -> fila del tablero
+
+    // Esta no viene en el UML, pero la necesito para que las pociones no
+    // dejen la vida por encima de la que el personaje tenía al empezar
+    private final int vidaMaxima;
+
+    public Personaje(String nombre, int vida, int ataqueBase, int posicionX, int posicionY) {
         this.nombre = nombre;
-        this.vidaMaxima = (vidaMaxima > 0) ? vidaMaxima : 1;
-        this.puntosAtaque = (puntosAtaque > 0) ? puntosAtaque : 1;
-        this.nivel = 1;
-        this.estaVivo = true;
-        this.experiencia = 0;
-        this.oro = 0.0;
-        this.setPuntosVida(this.vidaMaxima);
-        this.setOro(oro);
-    }
-    public Personaje(String nombre) {
-        this(nombre, 100, 15, 50.0);
+        this.vida = vida;
+        this.vidaMaxima = vida;
+        this.ataqueBase = ataqueBase;
+        this.posicionX = posicionX;
+        this.posicionY = posicionY;
     }
 
-    public void setPuntosVida(int vida) {
-        if (vida <= 0) {
-            this.puntosVida = 0;
-            this.estaVivo = false;
-        } else if (vida > this.vidaMaxima) {
-            this.puntosVida = this.vidaMaxima;
-            this.estaVivo = true;
-        } else {
-            this.puntosVida = vida;
-            this.estaVivo = true;
+    // Cada subclase decide cómo es su ataque único (por eso no lleva cuerpo)
+    public abstract void realizarAtaqueEspecial(Personaje objetivo);
+
+    public boolean estaVivo() {
+        return vida > 0;
+    }
+
+    public void recibirDano(int cantidad) {
+        if (cantidad <= 0) {
+            return; // un daño negativo curaría, y eso no queremos
+        }
+        vida -= cantidad;
+        if (vida < 0) {
+            vida = 0; // ojo: nunca puede bajar de cero
         }
     }
-    public boolean setOro(double oro) {
-        if (oro < 0.0) {
-            System.out.println("Saldo insuficiente");
-            return false;
+
+    // Implementación base de la interfaz; Guerrero la sobreescribe con su escudo
+    @Override
+    public void defender(int danoRecibido) {
+        int vidaAntes = vida;
+        recibirDano(danoRecibido);
+        System.out.printf("  %s recibe %d de dano (vida: %d -> %d)%n",
+                nombre, vidaAntes - vida, vidaAntes, vida);
+        if (!estaVivo()) {
+            System.out.printf("  %s ha caido!%n", nombre);
         }
-        this.oro = oro;
-        return true;
     }
-    protected void setNivel(int nivel) {
-        if (nivel < 1) {
+
+    // ---------- Sobrecarga: mismo nombre, distintos parámetros ----------
+
+    public void atacar(Personaje objetivo) {
+        atacar(objetivo, false);
+    }
+
+    public void atacar(Personaje objetivo, boolean modoFuria) {
+        if (objetivo == null || !objetivo.estaVivo()) {
             return;
         }
-        this.nivel = nivel;
+        int dano = ataqueBase;
+        if (modoFuria) {
+            dano = ataqueBase * 2;
+            System.out.printf("  %s entra en MODO FURIA!%n", nombre);
+            if (vida > 5) {
+                vida -= 5; // la furia cuesta un poquito de vida
+            }
+        }
+        System.out.printf("  %s ataca a %s%n", nombre, objetivo.getNombre());
+        objetivo.defender(dano);
     }
+
+    public void curar(int cantidad) {
+        if (!estaVivo() || cantidad <= 0) {
+            return;
+        }
+        int vidaAntes = vida;
+        vida = Math.min(vida + cantidad, vidaMaxima);
+        System.out.printf("  %s se cura %d puntos (vida: %d -> %d)%n",
+                nombre, vida - vidaAntes, vidaAntes, vida);
+    }
+
+    // Letra que se dibuja en el tablero; cada subclase pone la suya
+    public char getSimbolo() {
+        return '?';
+    }
+
+    // Texto para mostrar las estadísticas; Mago y Guerrero le agregan lo suyo
+    public String getEstado() {
+        return String.format("%s | Vida: %d/%d", nombre, vida, vidaMaxima);
+    }
+
+    // ---------- Getters y posición ----------
 
     public String getNombre() {
         return nombre;
     }
-    public int getPuntosVida() {
-        return puntosVida;
+
+    public int getVida() {
+        return vida;
     }
+
     public int getVidaMaxima() {
         return vidaMaxima;
     }
-    public int getPuntosAtaque() {
-        return puntosAtaque;
+
+    public int getAtaqueBase() {
+        return ataqueBase;
     }
-    public int getNivel() {
-        return nivel;
+
+    public int getPosicionX() {
+        return posicionX;
     }
-    public double getOro() {
-        return oro;
+
+    public int getPosicionY() {
+        return posicionY;
     }
-    public boolean isEstaVivo() {
-        return estaVivo;
-    }
-    public int getExperiencia() {
-        return experiencia;
-    }
-    public int getUltimoDanoInfligido() {
-        return ultimoDanoInfligido;
-    }
-    public boolean isUltimoGolpeCritico() {
-        return ultimoGolpeCritico;
-    }
-    public int getExperienciaParaSubir() {
-        return nivel * 50;
-    }
-    public void atacar(Enemigo enemigo) {
-        int dano = this.puntosAtaque;
-        this.ultimoGolpeCritico = false;
-        if (Math.random() < 0.15) {
-            dano = dano * 2;
-            this.ultimoGolpeCritico = true;
-        }
-        this.ultimoDanoInfligido = dano;
-        enemigo.recibirDano(dano);
-    }
-    public void usarPocion(int cantidadRestaurada) {
-        if (cantidadRestaurada <= 0) {
-            return;
-        }
-        this.setPuntosVida(this.puntosVida + cantidadRestaurada);
-    }
-    public void recibirDano(int cantidadDano) {
-        if (cantidadDano <= 0) {
-            return;
-        }
-        this.setPuntosVida(this.puntosVida - cantidadDano);
-    }
-    public void ganarExperiencia(int puntos) {
-        if (puntos <= 0) {
-            return;
-        }
-        this.experiencia += puntos;
-        while (this.experiencia >= this.getExperienciaParaSubir()) {
-            this.experiencia -= this.getExperienciaParaSubir();
-            this.setNivel(this.nivel + 1);
-            this.vidaMaxima += 10;
-            this.puntosAtaque += 2;
-            this.setPuntosVida(this.vidaMaxima);
-        }
+
+    public void setPosicion(int x, int y) {
+        this.posicionX = x;
+        this.posicionY = y;
     }
 }
