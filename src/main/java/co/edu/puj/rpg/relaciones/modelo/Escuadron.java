@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Agregación: el escuadrón agrupa personajes que se crean por fuera.
- * Si el escuadrón desaparece, los personajes siguen vivos.
- */
 public class Escuadron {
 
     private String nombre;
-    private List<Personaje> miembros; // Agregación (0..*)
-
+    private List<Personaje> miembros;
     public Escuadron(String nombre) {
         this.nombre = nombre;
-        this.miembros = new ArrayList<>(); // Inicialización de la colección
+        this.miembros = new ArrayList<>();
     }
 
     public void reclutarPersonaje(Personaje p) {
@@ -27,13 +22,12 @@ public class Escuadron {
             System.out.printf("%s ya pertenece al escuadron %s.%n", p.getNombre(), nombre);
             return;
         }
-        miembros.add(p); // solo guardo la referencia, no creo ni modifico al personaje
+        miembros.add(p);
         System.out.printf("%s fue reclutado en el escuadron %s.%n", p.getNombre(), nombre);
     }
 
     public void expulsarPersonaje(Personaje p) {
         if (p != null && miembros.remove(p)) {
-            // p sigue con su estado, vida y objetos intactos en memoria
             System.out.printf("%s fue expulsado del escuadron %s.%n", p.getNombre(), nombre);
         } else {
             System.out.println("Ese personaje no esta en el escuadron " + nombre + ".");

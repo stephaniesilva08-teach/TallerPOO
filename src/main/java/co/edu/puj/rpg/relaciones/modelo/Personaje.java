@@ -4,24 +4,16 @@ public class Personaje {
 
     private String nombre;
     private int nivel;
-    private Arma armaEquipada;   // Asociación unidireccional (0..1)
-    private Gremio gremio;       // Asociación bidireccional (0..1 de este lado)
-    private final CorazonRPG corazon; // Composición (1..1)
-
+    private Arma armaEquipada;
+    private Gremio gremio;
+    private final CorazonRPG corazon;
     public Personaje(String nombre, int nivel) {
         this.nombre = nombre;
         this.nivel = nivel;
-        this.armaEquipada = null; // Inicialmente desarmado
-        this.gremio = null;       // y sin gremio
-        // Composición: el corazón se crea AQUÍ, no llega de afuera.
-        // Y no hay setCorazon() por ningún lado a propósito.
+        this.armaEquipada = null;
+        this.gremio = null;
         this.corazon = new CorazonRPG(100 + nivel * 10, 50 + nivel * 5);
     }
-
-    // =====================================================================
-    //  Asociación unidireccional: Personaje -> Arma
-    // =====================================================================
-
     public void equiparArma(Arma nuevaArma) {
         if (nuevaArma == null) {
             System.out.println("No se puede equipar un arma nula.");
@@ -42,28 +34,19 @@ public class Personaje {
 
     public int calcularAtaqueTotal() {
         int ataqueBase = this.nivel * 5;
-        // Siempre verifico null antes de pedirle algo al arma (si no: NullPointerException)
         if (this.armaEquipada != null) {
             ataqueBase += this.armaEquipada.getDanioBase();
         }
         return ataqueBase;
     }
-
-    // =====================================================================
-    //  Asociación bidireccional: Personaje <-> Gremio
-    // =====================================================================
-
     public void unirseAGremio(Gremio nuevoGremio) {
-        // si es null o ya estoy en ese gremio, no hay nada que hacer
         if (nuevoGremio == null || nuevoGremio == this.gremio) {
             return;
         }
-        // si ya estaba en otro gremio, primero me salgo de ese
         if (this.gremio != null) {
             abandonarGremio();
         }
         this.gremio = nuevoGremio;
-        // sincronización cruzada: que el gremio también me anote
         nuevoGremio.agregarMiembro(this);
     }
 
@@ -72,14 +55,9 @@ public class Personaje {
             return;
         }
         Gremio anterior = this.gremio;
-        this.gremio = null;            // primero suelto mi referencia...
-        anterior.retirarMiembro(this); // ...y después le aviso al gremio (no hay bucle porque ya soy null)
+        this.gremio = null;
+        anterior.retirarMiembro(this);
     }
-
-    // =====================================================================
-    //  Delegación al corazón (el objeto corazón nunca sale de esta clase)
-    // =====================================================================
-
     public void recibirDano(int cantidad) {
         corazon.recibirDano(cantidad);
     }
@@ -108,10 +86,6 @@ public class Personaje {
         return corazon.getManaBase();
     }
 
-    // =====================================================================
-    //  Getters
-    // =====================================================================
-
     public String getNombre() {
         return nombre;
     }
@@ -128,15 +102,6 @@ public class Personaje {
         return gremio;
     }
 
-    // =====================================================================
-    //  Reportes (StringBuilder)
-    // =====================================================================
-
-    /**
-     * Ojo con esto: del gremio solo pongo el NOMBRE. Si llamara gremio.toString(),
-     * y el gremio llamara a toString() de cada miembro, se arma un ciclo infinito
-     * y revienta con StackOverflowError.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -150,7 +115,6 @@ public class Personaje {
         return sb.toString();
     }
 
-    /** Reporte de varias líneas para la opción de estado detallado. */
     public String generarReporte() {
         StringBuilder sb = new StringBuilder();
         sb.append("--- ").append(nombre).append(" ---\n");

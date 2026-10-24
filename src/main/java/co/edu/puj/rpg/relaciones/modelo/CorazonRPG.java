@@ -1,10 +1,5 @@
 package co.edu.puj.rpg.relaciones.modelo;
 
-/**
- * Núcleo de atributos vitales del Personaje (composición 1..1).
- * Solo Personaje lo crea (dentro de su constructor) y nadie de afuera
- * recibe la referencia, así el corazón vive y muere con su personaje.
- */
 public class CorazonRPG {
 
     private int saludBase;
@@ -15,7 +10,6 @@ public class CorazonRPG {
     public CorazonRPG(int saludBase, int manaBase) {
         this.saludBase = saludBase;
         this.manaBase = manaBase;
-        // al nacer arranca lleno
         this.saludActual = saludBase;
         this.manaActual = manaBase;
     }
@@ -36,8 +30,6 @@ public class CorazonRPG {
         return manaActual;
     }
 
-    // ---------- manipulación interna de vida y maná ----------
-
     public void recibirDano(int cantidad) {
         if (cantidad <= 0) {
             return;
@@ -51,8 +43,6 @@ public class CorazonRPG {
         }
         saludActual = Math.min(saludBase, saludActual + cantidad);
     }
-
-    /** @return true si alcanzó el maná, false si no (y no gasta nada). */
     public boolean gastarMana(int cantidad) {
         if (cantidad <= 0 || cantidad > manaActual) {
             return false;

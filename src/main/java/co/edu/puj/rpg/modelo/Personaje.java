@@ -1,21 +1,10 @@
 package co.edu.puj.rpg.modelo;
-
-/**
- * Clase base abstracta de los combatientes (heroes y enemigos).
- * Guarda el estado común y la lógica que Guerrero y Mago comparten,
- * pero NO se puede hacer new Personaje(...) porque es abstracta.
- */
 public abstract class Personaje implements ICombatiente {
-
-    // Atributos protegidos: las subclases los ven directo, el resto usa getters
     protected String nombre;
     protected int vida;
     protected int ataqueBase;
-    protected int posicionX; // horizontal -> columna del tablero
-    protected int posicionY; // vertical   -> fila del tablero
-
-    // Esta no viene en el UML, pero la necesito para que las pociones no
-    // dejen la vida por encima de la que el personaje tenía al empezar
+    protected int posicionX;
+    protected int posicionY;
     private final int vidaMaxima;
 
     public Personaje(String nombre, int vida, int ataqueBase, int posicionX, int posicionY) {
@@ -26,25 +15,19 @@ public abstract class Personaje implements ICombatiente {
         this.posicionX = posicionX;
         this.posicionY = posicionY;
     }
-
-    // Cada subclase decide cómo es su ataque único (por eso no lleva cuerpo)
     public abstract void realizarAtaqueEspecial(Personaje objetivo);
-
     public boolean estaVivo() {
         return vida > 0;
     }
-
     public void recibirDano(int cantidad) {
         if (cantidad <= 0) {
-            return; // un daño negativo curaría, y eso no queremos
+            return;
         }
         vida -= cantidad;
         if (vida < 0) {
-            vida = 0; // ojo: nunca puede bajar de cero
+            vida = 0;
         }
     }
-
-    // Implementación base de la interfaz; Guerrero la sobreescribe con su escudo
     @Override
     public void defender(int danoRecibido) {
         int vidaAntes = vida;
@@ -55,13 +38,9 @@ public abstract class Personaje implements ICombatiente {
             System.out.printf("  %s ha caido!%n", nombre);
         }
     }
-
-    // ---------- Sobrecarga: mismo nombre, distintos parámetros ----------
-
     public void atacar(Personaje objetivo) {
         atacar(objetivo, false);
     }
-
     public void atacar(Personaje objetivo, boolean modoFuria) {
         if (objetivo == null || !objetivo.estaVivo()) {
             return;
@@ -71,7 +50,7 @@ public abstract class Personaje implements ICombatiente {
             dano = ataqueBase * 2;
             System.out.printf("  %s entra en MODO FURIA!%n", nombre);
             if (vida > 5) {
-                vida -= 5; // la furia cuesta un poquito de vida
+                vida -= 5;
             }
         }
         System.out.printf("  %s ataca a %s%n", nombre, objetivo.getNombre());
@@ -87,18 +66,12 @@ public abstract class Personaje implements ICombatiente {
         System.out.printf("  %s se cura %d puntos (vida: %d -> %d)%n",
                 nombre, vida - vidaAntes, vidaAntes, vida);
     }
-
-    // Letra que se dibuja en el tablero; cada subclase pone la suya
     public char getSimbolo() {
         return '?';
     }
-
-    // Texto para mostrar las estadísticas; Mago y Guerrero le agregan lo suyo
     public String getEstado() {
         return String.format("%s | Vida: %d/%d", nombre, vida, vidaMaxima);
     }
-
-    // ---------- Getters y posición ----------
 
     public String getNombre() {
         return nombre;

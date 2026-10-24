@@ -11,13 +11,11 @@ import java.util.Scanner;
 
 public class AplicacionArenaRPG {
 
-    private static final int SIN_ENTRADA = Integer.MIN_VALUE; // cuando ya no hay nada más que leer
+    private static final int SIN_ENTRADA = Integer.MIN_VALUE;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
-
-        // Colecciones globales
         List<Personaje> personajes = new ArrayList<>();
         List<Gremio> gremios = new ArrayList<>();
         List<Escuadron> escuadrones = new ArrayList<>();
@@ -34,7 +32,7 @@ public class AplicacionArenaRPG {
 
             opcion = leerEntero(scanner);
             if (opcion == SIN_ENTRADA) {
-                opcion = 6; // si se acaba la entrada, salimos limpio
+                opcion = 6;
             }
 
             switch (opcion) {
@@ -64,11 +62,6 @@ public class AplicacionArenaRPG {
 
         scanner.close();
     }
-
-    // =====================================================================
-    //  Opción 1: crear personaje
-    // =====================================================================
-
     private static void crearPersonaje(Scanner scanner, List<Personaje> personajes) {
         System.out.print("Nombre del personaje: ");
         String nombre = leerTexto(scanner);
@@ -92,11 +85,6 @@ public class AplicacionArenaRPG {
         personajes.add(nuevo);
         System.out.println("Personaje creado: " + nuevo);
     }
-
-    // =====================================================================
-    //  Opción 2: gremios (asociación bidireccional)
-    // =====================================================================
-
     private static void gestionarGremio(Scanner scanner, List<Gremio> gremios, List<Personaje> personajes) {
         System.out.println("1. Crear gremio nuevo");
         System.out.println("2. Inscribir personaje en un gremio existente");
@@ -154,11 +142,6 @@ public class AplicacionArenaRPG {
             System.out.println("Opción inválida.");
         }
     }
-
-    // =====================================================================
-    //  Opción 3: escuadrones (agregación)
-    // =====================================================================
-
     private static void gestionarEscuadron(Scanner scanner, List<Escuadron> escuadrones, List<Personaje> personajes) {
         if (personajes.isEmpty()) {
             System.out.println("Primero crea al menos un personaje (opción 1).");
@@ -209,11 +192,6 @@ public class AplicacionArenaRPG {
         }
         System.out.println(escuadron);
     }
-
-    // =====================================================================
-    //  Opción 4: armas (asociación unidireccional)
-    // =====================================================================
-
     private static void gestionarArma(Scanner scanner, List<Personaje> personajes) {
         if (personajes.isEmpty()) {
             System.out.println("Primero crea al menos un personaje (opción 1).");
@@ -250,18 +228,13 @@ public class AplicacionArenaRPG {
             System.out.println("Opción inválida.");
         }
     }
-
-    // =====================================================================
-    //  Opción 5: estado detallado (printf + StringBuilder)
-    // =====================================================================
-
     private static void mostrarEstado(List<Personaje> personajes, List<Gremio> gremios, List<Escuadron> escuadrones) {
         if (personajes.isEmpty()) {
             System.out.println("Aún no hay personajes registrados.");
             return;
         }
 
-        System.out.println("\n================ PERSONAJES ================");
+        System.out.println("\n== PERSONAJES ==");
         System.out.printf("%-12s %5s %7s %9s %9s %-22s %-12s%n",
                 "Nombre", "Nivel", "Ataque", "Salud", "Mana", "Arma", "Gremio");
         for (Personaje p : personajes) {
@@ -273,20 +246,19 @@ public class AplicacionArenaRPG {
                     p.getNombre(), p.getNivel(), p.calcularAtaqueTotal(), salud, mana, arma, gremio);
         }
 
-        // Reporte detallado armado con StringBuilder
         StringBuilder reporte = new StringBuilder();
-        reporte.append("\n============ DETALLE (Corazón RPG) ============\n");
+        reporte.append("\n= DETALLE =\n");
         for (Personaje p : personajes) {
             reporte.append(p.generarReporte());
         }
-        reporte.append("\n================== GREMIOS ==================\n");
+        reporte.append("\n= GREMIOS =\n");
         if (gremios.isEmpty()) {
             reporte.append("(sin gremios)\n");
         }
         for (Gremio g : gremios) {
             reporte.append(g).append('\n');
         }
-        reporte.append("\n================ ESCUADRONES ================\n");
+        reporte.append("\n=ESCUADRONES =\n");
         if (escuadrones.isEmpty()) {
             reporte.append("(sin escuadrones)\n");
         }
@@ -295,10 +267,6 @@ public class AplicacionArenaRPG {
         }
         System.out.print(reporte);
     }
-
-    // =====================================================================
-    //  Utilidades
-    // =====================================================================
 
     private static Personaje seleccionarPersonaje(Scanner scanner, List<Personaje> lista) {
         if (lista.isEmpty()) {
@@ -344,16 +312,12 @@ public class AplicacionArenaRPG {
         }
         return null;
     }
-
-    /** Lee una línea completa (así no queda el salto de línea colgado como pasa con nextInt). */
     private static String leerTexto(Scanner scanner) {
         if (!scanner.hasNextLine()) {
             return "";
         }
         return scanner.nextLine().trim();
     }
-
-    /** Lee un entero; si escriben letras devuelve -1 en vez de romper el programa. */
     private static int leerEntero(Scanner scanner) {
         if (!scanner.hasNextLine()) {
             return SIN_ENTRADA;

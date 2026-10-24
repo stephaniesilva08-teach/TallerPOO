@@ -1,9 +1,5 @@
 package co.edu.puj.rpg.relaciones.modelo;
 
-/**
- * Arma que puede equipar un Personaje.
- * Ojo: el Arma NO conoce a su dueño (asociación unidireccional).
- */
 public class Arma {
 
     private String nombre;

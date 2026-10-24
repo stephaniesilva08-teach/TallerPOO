@@ -15,15 +15,13 @@ public class MainArena {
 
     private static final int TAM = 5;
     private static final char VACIO = '.';
-    private static final int COFRE_X = 2; // columna del cofre
-    private static final int COFRE_Y = 2; // fila del cofre
-    private static final int SIN_ENTRADA = Integer.MIN_VALUE; // cuando ya no hay nada que leer
+    private static final int COFRE_X = 2;
+    private static final int COFRE_Y = 2;
+    private static final int SIN_ENTRADA = Integer.MIN_VALUE;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Random azar = new Random();
-
-        // ---------- 1. Inicialización ----------
         char[][] tablero = new char[TAM][TAM];
         List<Personaje> heroes = new ArrayList<>();
         List<Personaje> enemigos = new ArrayList<>();
@@ -40,7 +38,7 @@ public class MainArena {
         inventario.agregar(new Pocion("Pocion Pequena", 30));
         inventario.agregar(new Pocion("Pocion Grande", 50));
 
-        Personaje heroePrincipal = heroes.get(0); // Thorin es el que tiene que llegar al cofre
+        Personaje heroePrincipal = heroes.get(0);
         boolean cofreAlcanzado = false;
         boolean salir = false;
         int ronda = 0;
@@ -49,17 +47,12 @@ public class MainArena {
         System.out.println("Gana si eliminas a todos los enemigos o si " + heroePrincipal.getNombre()
                 + " llega al cofre [C].");
 
-        // ---------- 2. Ciclo principal ----------
         do {
             ronda++;
             System.out.printf("%n########## RONDA %d ##########%n", ronda);
-
-            // ---------- 3. Renderizado y estado ----------
             actualizarTablero(tablero, heroes, enemigos);
             mostrarTablero(tablero);
             mostrarEstado(heroes, enemigos, inventario);
-
-            // ---------- 4. Turno del jugador ----------
             for (Personaje heroe : heroes) {
                 if (!heroe.estaVivo()) {
                     continue;
@@ -103,19 +96,13 @@ public class MainArena {
                 }
                 actualizarTablero(tablero, heroes, enemigos);
             }
-
-            // ---------- 5. Turno enemigo ----------
             if (!salir && !cofreAlcanzado && hayVivos(enemigos) && hayVivos(heroes)) {
                 turnoEnemigo(enemigos, heroes, azar);
             }
-
-            // ---------- 6. Limpieza de bajas ----------
             heroes.removeIf(p -> !p.estaVivo());
             enemigos.removeIf(p -> !p.estaVivo());
 
         } while (!heroes.isEmpty() && !enemigos.isEmpty() && !cofreAlcanzado && !salir);
-
-        // ---------- Resultado ----------
         System.out.println("\n================ FIN DE LA PARTIDA ================");
         if (cofreAlcanzado) {
             System.out.println("VICTORIA! " + heroePrincipal.getNombre() + " llego al cofre.");
@@ -128,27 +115,16 @@ public class MainArena {
         }
         scanner.close();
     }
-
-    // =====================================================================
-    //  Tablero 2D
-    // =====================================================================
-
-    /** Dibuja la matriz tal cual la pide la guía (bucles anidados). */
     public static void mostrarTablero(char[][] matriz) {
         System.out.println();
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
                 System.out.print("[" + matriz[i][j] + "]");
             }
-            System.out.println(); // salto de línea por cada fila
+            System.out.println();
         }
         System.out.println("G=Guerrero M=Mago E=Enemigo C=Cofre .=Vacio");
     }
-
-    /**
-     * Reconstruye la matriz desde las posiciones reales de cada unidad.
-     * Primero todo vacío, luego cofre, enemigos y al final los héroes.
-     */
     private static void actualizarTablero(char[][] tablero, List<Personaje> heroes, List<Personaje> enemigos) {
         for (int i = 0; i < tablero.length; i++) {
             for (int j = 0; j < tablero[i].length; j++) {
@@ -168,8 +144,6 @@ public class MainArena {
             }
         }
     }
-
-    // Esto me evita el IndexOutOfBoundsException al mover cerca de los bordes
     private static boolean dentroDelTablero(int x, int y) {
         return x >= 0 && x < TAM && y >= 0 && y < TAM;
     }
@@ -187,11 +161,6 @@ public class MainArena {
         }
         return false;
     }
-
-    // =====================================================================
-    //  Acciones del jugador
-    // =====================================================================
-
     private static boolean atacarEnemigo(Scanner scanner, Personaje heroe, List<Personaje> enemigos) {
         List<Personaje> vivos = new ArrayList<>();
         for (Personaje e : enemigos) {
@@ -215,8 +184,6 @@ public class MainArena {
             System.out.println("Objetivo invalido.");
             return false; // no gasta turno
         }
-
-        // Polimorfismo: según sea Guerrero o Mago, se ejecuta su versión
         heroe.realizarAtaqueEspecial(vivos.get(eleccion - 1));
         return true;
     }
@@ -228,14 +195,13 @@ public class MainArena {
         }
 
         if (heroe.getVida() >= heroe.getVidaMaxima()) {
-            // para no gastar una pocion en balde
             System.out.println(heroe.getNombre() + " ya tiene la vida llena.");
             return false;
         }
 
         System.out.println("Inventario:");
         for (int i = 0; i < inventario.tamano(); i++) {
-            Pocion p = inventario.obtener(i); // sin casteo gracias al genérico
+            Pocion p = inventario.obtener(i);
             System.out.printf("%d. %s%n", i + 1, p);
         }
         System.out.print("Pocion (0 para cancelar): ");
@@ -296,11 +262,6 @@ public class MainArena {
         mostrarTablero(tablero);
         return true;
     }
-
-    // =====================================================================
-    //  IA enemiga
-    // =====================================================================
-
     private static void turnoEnemigo(List<Personaje> enemigos, List<Personaje> heroes, Random azar) {
         System.out.println("\n--- Turno de los enemigos ---");
         for (Personaje enemigo : enemigos) {
@@ -322,17 +283,12 @@ public class MainArena {
             if (tirada < 35) {
                 enemigo.realizarAtaqueEspecial(objetivo);
             } else if (tirada < 55) {
-                enemigo.atacar(objetivo, true); // sobrecarga con furia
+                enemigo.atacar(objetivo, true);
             } else {
-                enemigo.atacar(objetivo); // sobrecarga normal
+                enemigo.atacar(objetivo);
             }
         }
     }
-
-    // =====================================================================
-    //  Utilidades
-    // =====================================================================
-
     private static void mostrarEstado(List<Personaje> heroes, List<Personaje> enemigos, Inventario<Pocion> inv) {
         System.out.println("\n-- Heroes --");
         for (Personaje h : heroes) {
@@ -361,8 +317,6 @@ public class MainArena {
         }
         return total;
     }
-
-    /** Lee un entero; si escriben letras devuelve -1 en vez de romper el programa. */
     private static int leerEntero(Scanner scanner) {
         if (!scanner.hasNextLine()) {
             return SIN_ENTRADA;

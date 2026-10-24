@@ -1,6 +1,5 @@
 package co.edu.puj.rpg.modelo;
 
-/** Mago: combate mágico, gasta maná para hacer su ataque especial. */
 public class Mago extends Personaje {
 
     private static final int COSTO_ESPECIAL = 15;
@@ -24,7 +23,6 @@ public class Mago extends Personaje {
                     nombre, objetivo.getNombre(), puntosMana);
             objetivo.defender(dano);
         } else {
-            // sin maná no hay hechizo: ataca normal y recupera un poquito
             System.out.printf("  %s no tiene mana suficiente, ataca normal%n", nombre);
             puntosMana += 5;
             atacar(objetivo);
@@ -35,12 +33,10 @@ public class Mago extends Personaje {
     public char getSimbolo() {
         return 'M';
     }
-
     @Override
     public String getEstado() {
         return super.getEstado() + " | Mana: " + puntosMana;
     }
-
     public int getPuntosMana() {
         return puntosMana;
     }
